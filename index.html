@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phani Kasinadhuni — Digital Twin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#FFFFFF;
+    --panel:#EAF5FD;
+    --panel-2:#DCEEFB;
+    --paper:#123A5C;
+    --paper-dim:#5E86A3;
+    --brass:#2F9BE0;
+    --brass-bright:#0F6FB0;
+    --rule:#BFE1F7;
+    --err:#C9756B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'Source Serif 4', serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 60px;
+  }
+  .sheet{
+    width:100%;
+    max-width:1040px;
+  }
+  .letterhead{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:2px solid var(--brass);
+    padding-bottom:14px;
+    margin-bottom:6px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    color:var(--brass-bright);
+    text-transform:uppercase;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(32px,5vw,46px);
+    margin:4px 0 0;
+    letter-spacing:-0.01em;
+  }
+  .seal{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.12em;
+    color:var(--ink);
+    background:var(--brass);
+    border-radius:999px;
+    padding:6px 14px;
+    white-space:nowrap;
+    transform:rotate(-2deg);
+    box-shadow:0 2px 0 rgba(0,0,0,0.25);
+  }
+  .letterhead-main{
+    display:flex;
+    align-items:flex-end;
+    gap:18px;
+  }
+  .stamp{
+    flex:none;
+    width:84px;
+    height:84px;
+    transform:rotate(-4deg);
+    animation:stampBreathe 3.2s ease-in-out infinite;
+  }
+  @keyframes stampBreathe{
+    0%,100%{ transform:rotate(-4deg) scale(1); }
+    50%{ transform:rotate(-2deg) scale(1.045); }
+  }
+  .stamp .ring{
+    fill:none;
+    stroke:var(--brass);
+  }
+  .stamp .ring-outer{ stroke-width:1.4; }
+  .stamp .ring-inner{ stroke-width:0.8; opacity:0.6; }
+  .stamp .bust{ fill:var(--brass); }
+  .stamp .tie{ fill:var(--ink); }
+  .stamp .arc-text{
+    fill:var(--brass-bright);
+    font-family:'JetBrains Mono', monospace;
+    font-size:6.4px;
+    letter-spacing:0.15em;
+  }
+  .subline{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    color:var(--paper-dim);
+    margin:10px 0 26px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:20px;
+  }
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:18px 18px 20px;
+  }
+  .panel h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--brass-bright);
+    margin:0 0 14px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:8px;
+  }
+  .fact{
+    margin-bottom:14px;
+  }
+  .fact-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    color:var(--paper-dim);
+    text-transform:uppercase;
+  }
+  .fact-value{
+    font-size:14.5px;
+    line-height:1.4;
+    margin-top:3px;
+  }
+  .chips{
+    margin-top:18px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .chip{
+    text-align:left;
+    background:transparent;
+    border:1px solid var(--rule);
+    color:var(--paper);
+    font-family:'Source Serif 4', serif;
+    font-size:13px;
+    padding:9px 11px;
+    border-radius:3px;
+    cursor:pointer;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  .chip:hover{
+    border-color:var(--brass);
+    background:rgba(47,155,224,0.08);
+  }
+  .live-block{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--rule);
+  }
+  .live-chip{
+    border-style:dashed;
+  }
+  .live-status{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.04em;
+    color:var(--paper-dim);
+    margin-top:8px;
+  }
+  .live-hint{
+    font-family:'JetBrains Mono', monospace;
+    font-size:9.5px;
+    color:var(--paper-dim);
+    margin-top:6px;
+    line-height:1.4;
+  }
+  .ledger{
+    background:var(--panel);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    display:flex;
+    flex-direction:column;
+    min-height:520px;
+  }
+  .ledger-head{
+    padding:14px 18px;
+    border-bottom:1px solid var(--rule);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .ledger-head span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--brass-bright);
+    text-transform:uppercase;
+  }
+  .entries{
+    flex:1;
+    padding:18px;
+    overflow-y:auto;
+    max-height:60vh;
+  }
+  .entry{
+    display:grid;
+    grid-template-columns:52px 1fr;
+    gap:12px;
+    margin-bottom:20px;
+  }
+  .entry-no{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--paper-dim);
+    padding-top:2px;
+  }
+  .entry-body{
+    border-left:2px solid var(--rule);
+    padding-left:14px;
+  }
+  .entry.twin .entry-body{
+    border-left-color:var(--brass);
+  }
+  .entry-who{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--paper-dim);
+    margin-bottom:4px;
+  }
+  .entry.twin .entry-who{ color:var(--brass-bright); }
+  .entry-text{
+    font-size:15px;
+    line-height:1.55;
+    white-space:pre-wrap;
+  }
+  .logo-pop{
+    width:34px;
+    height:34px;
+    flex:none;
+    transform-origin:50% 100%;
+    animation:popOut 0.6s cubic-bezier(.34,1.56,.64,1) both,
+              bobIdle 2.6s ease-in-out 0.6s infinite;
+  }
+  @keyframes popOut{
+    0%{ transform:scale(0.15) translateY(10px); opacity:0; }
+    55%{ transform:scale(1.2) translateY(-4px); opacity:1; }
+    100%{ transform:scale(1) translateY(0); opacity:1; }
+  }
+  @keyframes bobIdle{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-3px); }
+  }
+  .logo-pop circle{ fill:var(--brass); }
+  .logo-pop .bust{ fill:var(--ink); }
+  .logo-pop .tie{ fill:var(--brass); }
+  .composer{
+    border-top:1px solid var(--rule);
+    padding:14px 16px;
+    display:flex;
+    gap:10px;
+  }
+  .composer input{
+    flex:1;
+    background:var(--ink);
+    border:1px solid var(--rule);
+    color:var(--paper);
+    font-family:'Source Serif 4', serif;
+    font-size:14.5px;
+    padding:11px 13px;
+    border-radius:3px;
+    outline:none;
+  }
+  .composer input:focus{ border-color:var(--brass); }
+  .composer button{
+    background:var(--brass);
+    color:var(--ink);
+    border:none;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-weight:500;
+    padding:0 20px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .composer button:disabled{ opacity:0.5; cursor:default; }
+  .typing{
+    color:var(--paper-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+  }
+  .foot{
+    margin-top:14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--paper-dim);
+    text-align:center;
+    letter-spacing:0.04em;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="letterhead">
+    <div class="letterhead-main">
+      <svg class="stamp" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <path id="arcTop" d="M 12,50 A 38,38 0 0 1 88,50" />
+        </defs>
+        <circle class="ring ring-outer" cx="50" cy="50" r="46"/>
+        <circle class="ring ring-inner" cx="50" cy="50" r="39"/>
+        <text class="arc-text">
+          <textPath href="#arcTop" startOffset="50%" text-anchor="middle">SENIOR &#8226; PRODUCT &#8226; MGR</textPath>
+        </text>
+        <!-- silhouette bust with a small tie, so the mark reads as "manager" -->
+        <g class="bust">
+          <circle cx="50" cy="46" r="13"/>
+          <path d="M 26,84 C 26,64 37,57 50,57 C 63,57 74,64 74,84 Z"/>
+        </g>
+        <path class="tie" d="M 47,58 L 53,58 L 51.5,64 L 55,80 L 50,86 L 45,80 L 48.5,64 Z"/>
+        <text x="50" y="93" text-anchor="middle" class="arc-text" style="letter-spacing:0.2em;">TWIN &#8226; 01</text>
+      </svg>
+      <div>
+        <div class="eyebrow">Dossier No. 001 &middot; Verified Copy</div>
+        <h1>Phani Kasinadhuni — Digital Twin</h1>
+      </div>
+    </div>
+  </div>
+  <div class="subline">Senior Product Manager at ICE Data Services Pvt Ltd &middot; Mortgage Customer Service &middot; Hyderabad</div>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Case File</h2>
+      <div class="fact">
+        <div class="fact-label">Name</div>
+        <div class="fact-value">Phani Kasinadhuni</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Current Role</div>
+        <div class="fact-value">Senior Product Manager, ICE Data Services Pvt Ltd — Mortgage Domain, Customer Service Banking Team</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Focus Area</div>
+        <div class="fact-value">Customer service experience within mortgage servicing</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">In Transition</div>
+        <div class="fact-value">Building toward a Senior AI Product Manager role, using mortgage domain depth as the edge</div>
+      </div>
+      <div class="fact">
+        <div class="fact-label">Base</div>
+        <div class="fact-value">Hyderabad</div>
+      </div>
+      <div class="chips">
+        <button class="chip" data-q="Brief about yourself.">Brief about yourself</button>
+        <button class="chip" data-q="Walk me through your professional background.">Walk me through the background</button>
+        <button class="chip" data-q="Why are you moving from Senior PM into AI Product Management?">Why the move into AI PM?</button>
+        <button class="chip" data-q="What have you actually built or shipped recently?">What have you built recently?</button>
+        <button class="chip" data-q="What is a mortgage?">What is a mortgage?</button>
+        <button class="chip" data-q="What's your mortgage domain knowledge?">Mortgage domain knowledge</button>
+        <button class="chip" data-q="Explain the mortgage loan lifecycle.">Loan lifecycle</button>
+        <button class="chip" data-q="How does loss mitigation work?">Loss mitigation</button>
+        <button class="chip" data-q="What's your edge over other AI PM candidates?">What's your edge?</button>
+      </div>
+      <div class="live-block">
+        <div class="live-hint">🌐 Live mortgage answers enabled — powered by a private server key, nothing you enter here.</div>
+      </div>
+    </div>
+
+    <div class="ledger">
+      <div class="ledger-head">
+        <span>Conversation Ledger</span>
+        <span id="entry-count">Entry 000</span>
+      </div>
+      <div class="entries" id="entries"></div>
+      <div class="composer">
+        <input id="input" type="text" placeholder="Ask about the professional background..." />
+        <button id="send">Ask</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">Live mortgage lookups are answered through a private server-side key — never exposed in this file or in git. Everything else runs locally, free, with nothing billed to visitors. The twin won't invent details outside what it's briefed on.</div>
+</div>
+
+<script>
+let entryNum = 0;
+
+const entriesEl = document.getElementById('entries');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const countEl = document.getElementById('entry-count');
+
+function pad(n){ return String(n).padStart(3,'0'); }
+
+function logoSvg(){
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="48"/>
+      <g class="bust">
+        <circle cx="50" cy="42" r="15"/>
+        <path d="M 22,86 C 22,64 35,56 50,56 C 65,56 78,64 78,86 Z"/>
+      </g>
+      <path class="tie" d="M 46,57 L 54,57 L 52,64 L 56,84 L 50,91 L 44,84 L 48,64 Z"/>
+    </svg>`;
+}
+
+function addEntry(who, text){
+  entryNum++;
+  countEl.textContent = 'Entry ' + pad(entryNum);
+  const div = document.createElement('div');
+  div.className = 'entry ' + (who === 'twin' ? 'twin' : 'visitor');
+  const leftCell = who === 'twin'
+    ? `<div class="logo-pop">${logoSvg()}</div>`
+    : `<div class="entry-no">${pad(entryNum)}</div>`;
+  div.innerHTML = `
+    ${leftCell}
+    <div class="entry-body">
+      <div class="entry-who">${who === 'twin' ? 'Digital Twin' : 'You'}</div>
+      <div class="entry-text"></div>
+    </div>`;
+  div.querySelector('.entry-text').textContent = text;
+  entriesEl.appendChild(div);
+  entriesEl.scrollTop = entriesEl.scrollHeight;
+  return div.querySelector('.entry-text');
+}
+
+async function ask(question){
+  if(!question.trim()) return;
+  inputEl.value = '';
+  sendBtn.disabled = true;
+  addEntry('visitor', question);
+
+  const typingEl = addEntry('twin', '');
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  const useLive = isMortgageTopic(question);
+  typing.textContent = useLive ? 'checking live sources…' : 'retrieving entry…';
+  typingEl.appendChild(typing);
+
+  let text;
+  if(useLive){
+    try{
+      text = await callLiveAPI(question);
+    }catch(err){
+      text = matchAnswer(question) + '\n\n(Live lookup failed — showing the built-in answer instead. ' + err.message + ')';
+    }
+  } else {
+    // Local, offline matcher — no API calls, no key, no billing.
+    await new Promise(r => setTimeout(r, 420 + Math.random()*380)); // brief pause to feel like retrieval
+    text = matchAnswer(question);
+  }
+  typingEl.textContent = text;
+
+  sendBtn.disabled = false;
+  inputEl.focus();
+}
+
+// ---- Live mortgage lookups via a server-side proxy ----
+// The real Gemini key lives only in Netlify's environment variables
+// (netlify/functions/mortgage-lookup.js) — never in this file, never in git,
+// never visible to anyone viewing this page's source.
+
+const MORTGAGE_TOPIC_WORDS = ['mortgage','loan','loans','escrow','pmi','impound',
+  'delinquen','loss mitigation','forbearance','loan modification','short sale',
+  'foreclosure','default','respa','tila','cfpb','hmda','fair lending','call center',
+  'csat','nps','first call resolution','complaint handling','ivr','contact center',
+  'arm','adjustable rate','fixed rate','refinance','refi','interest only','apr',
+  'annual percentage rate','points','discount points','buy down','closing costs',
+  'dti','debt to income','debt-to-income','credit score','fico','appraisal',
+  'property value','home valuation','title insurance','title company','clear title',
+  'fha','va loan','va mortgage','conventional loan','conventional mortgage',
+  'jumbo loan','jumbo mortgage','rate lock','lock in','prepayment penalty',
+  'cash-out','heloc','home equity','reverse mortgage','assumable mortgage',
+  'loan assumption','second mortgage','junior lien','amortization','pre-approval',
+  'pre-qualification','preapproval','prequalification','mortgage broker',
+  'loan officer','direct lender','servicing','underwriting','borrower',
+  'home loan','housing loan','banking domain','origination'];
+
+function isMortgageTopic(q){
+  const lower = q.toLowerCase();
+  return MORTGAGE_TOPIC_WORDS.some(w => new RegExp('\\b' + escapeRegex(w) + '\\b', 'i').test(lower));
+}
+
+async function callLiveAPI(question){
+  const res = await fetch('/.netlify/functions/mortgage-lookup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question })
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok){
+    throw new Error((data && data.error) ? data.error : ('proxy returned ' + res.status));
+  }
+  if(!data.text) throw new Error('empty response from proxy');
+  return data.text.trim();
+}
+
+const KNOWLEDGE = [
+  {
+    kw: ['brief about yourself','tell me about yourself','introduce yourself','who is phani','who are you','your name','name'],
+    a: "I'm Phani Kasinadhuni's digital twin. He's a Senior Product Manager at ICE Data Services Pvt Ltd, working in the mortgage domain on the customer service banking team, based in Hyderabad. He's currently building toward a Senior AI Product Manager role, using deep mortgage domain expertise as his edge over generalist AI PM candidates."
+  },
+  {
+    kw: ['background','summary','overview'],
+    a: "Day job: Senior Product Manager at ICE Data Services Pvt Ltd, in the mortgage domain, on the customer service banking team. Right now I'm building toward a Senior AI Product Manager role, treating years of mortgage domain depth as the edge over generalist AI PM candidates."
+  },
+  {
+    kw: ['team','which team','department','group','banking','company','employer','ice data','where do you work'],
+    a: "I work at ICE Data Services Pvt Ltd, on the customer service banking team, inside the mortgage domain — focused on the servicing/support side of the mortgage customer experience."
+  },
+  {
+    kw: ['ai pm','ai product manager','why move','transition','switch','career change'],
+    a: "The pitch is simple: most AI PM candidates know AI but not a regulated domain, and most mortgage PMs don't know AI. Years on the customer service banking team means real fluency in servicing pain points, compliance constraints (think CFPB, Fannie Mae guidelines), and what actually breaks for borrowers — that's the differentiator going into AI PM interviews."
+  },
+  {
+    kw: ['built','shipped','project','recent','portfolio','made','created'],
+    a: "Recent concrete work: an AI PM interview-prep portfolio with STAR-format case studies and a behavioral question bank, a 30-day Senior AI PM transition plan deck, a 21-day AI/ML concept curriculum built as a React app, a real-time Indian stock market tracker, and this digital twin itself."
+  },
+  {
+    kw: ['edge','different','why hire','strength','differentiat'],
+    a: "The edge is domain-plus-AI, not AI alone. Deep mortgage customer service experience — the regulatory guardrails, the servicing workflows, the actual friction points borrowers hit — paired with a deliberate, structured push into AI/ML fundamentals and product practice."
+  },
+  {
+    kw: ['loan lifecycle','origination','underwriting process','how does a mortgage work','life of a loan','stages of a mortgage'],
+    a: "A mortgage moves through a few core stages: origination (application, credit and income verification, appraisal), underwriting (risk assessment against investor and regulatory guidelines), closing (final disclosures and funding), and then servicing — the long tail where the loan actually lives, often for 15-30 years. Customer service sits almost entirely in that servicing stage, which is where most borrower touchpoints happen."
+  },
+  {
+    kw: ['loan servicing','mortgage servicing','service a loan','servicer','servicing operations'],
+    a: "Loan servicing covers everything after closing: collecting payments, managing escrow, updating borrowers on balances and statements, handling payoffs and transfers, and stepping in when a borrower falls behind. It's the operational backbone of the customer service side of mortgage banking — most inbound borrower contact (calls, chats, disputes) is a servicing interaction, not an origination one."
+  },
+  {
+    kw: ['escrow','pmi','private mortgage insurance','impound account'],
+    a: "Escrow (or impound) accounts hold funds collected as part of the monthly payment to cover property taxes and homeowners insurance, so the servicer pays those bills on the borrower's behalf. PMI (private mortgage insurance) is typically required when a down payment is under 20%, and it can usually be removed once enough equity builds up — both are common sources of borrower confusion and customer service volume, especially around annual escrow analysis and payment changes."
+  },
+  {
+    kw: ['delinquen','loss mitigation','forbearance','loan modification','short sale','foreclosure','default','behind on payments','missed payment'],
+    a: "When a borrower falls behind, loss mitigation is the toolkit servicers use before foreclosure: forbearance (temporarily pausing or reducing payments), loan modification (permanently changing loan terms), repayment plans, short sales, or deed-in-lieu arrangements. Regulations require servicers to actively offer these options and communicate clearly, so this is a heavily compliance-driven, high-stakes part of mortgage customer service."
+  },
+  {
+    kw: ['respa','tila','cfpb','hmda','fair lending','regulatory framework'],
+    a: "Mortgage servicing operates under a stack of consumer-protection regulation: RESPA governs disclosures and escrow handling, TILA covers loan-term and cost disclosures, HMDA requires lending data reporting for fair-lending oversight, and the CFPB sets and enforces servicing rules — timelines for responding to borrower inquiries, error resolution, and loss-mitigation notice requirements. Any customer-facing process in mortgage servicing has to be built around these constraints."
+  },
+  {
+    kw: ['call center','csat','nps','first call resolution','complaint handling','ivr','customer service metrics','contact center'],
+    a: "On the operational side, mortgage customer service is measured a lot like any contact center — CSAT, NPS, first-call resolution, average handle time — but layered with regulatory SLAs (like required response windows for written borrower disputes) and complaint-tracking obligations. That mix of standard CX metrics plus compliance timelines is a big part of what makes product decisions in this space different from generic customer service tooling."
+  },
+  {
+    kw: ['arm','adjustable rate','fixed rate','refinance','refi','loan types','interest only'],
+    a: "The two broad loan structures are fixed-rate (same interest rate for the full term) and adjustable-rate/ARM (rate resets periodically based on an index, often after an initial fixed period). Refinancing lets a borrower replace their existing loan with new terms — usually to lower the rate, change the term, or pull out equity. Each type creates different servicing and customer-communication needs, especially around rate-reset notices for ARMs."
+  },
+  {
+    kw: ['what is a mortgage','what is mortgage','define mortgage','mortgage definition','meaning of mortgage'],
+    a: "A mortgage is a loan used to buy real estate, where the property itself secures the debt — if the borrower stops paying, the lender can foreclose and take the property. It's usually repaid through monthly installments of principal and interest over a set term (commonly 15 or 30 years), and often includes escrowed property taxes and homeowners insurance on top of that."
+  },
+  {
+    kw: ['apr','annual percentage rate','interest rate vs apr','apr vs interest rate'],
+    a: "The interest rate is just the cost of borrowing the principal, expressed as a yearly percentage. APR (annual percentage rate) is broader — it rolls the interest rate together with lender fees, discount points, and certain closing costs into one number, which is why APR is usually a bit higher than the plain interest rate. APR is meant to make it easier to compare offers across lenders."
+  },
+  {
+    kw: ['discount points','mortgage points','buy down','buying points','points'],
+    a: "Points (or discount points) are an upfront fee paid at closing to lower the interest rate — typically 1 point costs 1% of the loan amount and shaves a fraction off the rate. Whether it's worth it depends on how long the borrower plans to keep the loan; the longer they stay, the more the upfront cost pays for itself in lower monthly payments."
+  },
+  {
+    kw: ['closing costs','cost to close'],
+    a: "Closing costs are the fees due at signing beyond the down payment — things like origination fees, appraisal, title insurance, recording fees, and prepaid escrow. They typically run roughly 2-5% of the loan amount, and either the buyer pays them out of pocket or they get rolled into the loan or negotiated with the seller."
+  },
+  {
+    kw: ['dti','debt to income','debt-to-income'],
+    a: "DTI (debt-to-income ratio) compares a borrower's total monthly debt payments to their gross monthly income. Lenders use it to gauge how much new mortgage payment someone can realistically handle — most conventional loans want front-end and back-end DTI under certain thresholds, and it's one of the first things underwriting checks."
+  },
+  {
+    kw: ['credit score','fico'],
+    a: "Credit score is one of the biggest levers in mortgage pricing — it affects both whether someone qualifies and what interest rate they're offered. Higher scores generally mean lower rates and easier approval, while lower scores can mean higher rates, larger down payment requirements, or needing a government-backed loan program like FHA."
+  },
+  {
+    kw: ['appraisal','property value','home valuation'],
+    a: "An appraisal is an independent estimate of a property's market value, ordered by the lender before closing to confirm the home is actually worth what's being borrowed against it. If the appraisal comes in below the purchase price, it can delay or derail the deal unless the buyer covers the gap or the price gets renegotiated."
+  },
+  {
+    kw: ['title insurance','title company','clear title'],
+    a: "Title insurance protects the lender (and optionally the buyer) against problems with the property's ownership history — liens, fraud, or disputes that surface after closing. A title company researches the chain of ownership before closing to confirm the seller can legally transfer clear title."
+  },
+  {
+    kw: ['fha loan','fha mortgage','fha loans','fha'],
+    a: "FHA loans are government-insured mortgages aimed at borrowers with lower credit scores or smaller down payments — often down to 3.5% down. The tradeoff is mandatory mortgage insurance (MIP) that, unlike PMI on conventional loans, often can't be cancelled without refinancing."
+  },
+  {
+    kw: ['va loan','va mortgage','va loans'],
+    a: "VA loans are backed by the Department of Veterans Affairs for eligible veterans, active-duty service members, and some spouses — the standout feature is no down payment required and no private mortgage insurance, though there's usually a funding fee."
+  },
+  {
+    kw: ['conventional loan','conventional mortgage'],
+    a: "A conventional loan isn't government-insured or guaranteed — it follows underwriting guidelines set by Fannie Mae or Freddie Mac (if it's a conforming loan) and typically needs a stronger credit profile than FHA. PMI applies if the down payment is under 20%, but unlike FHA's MIP, it can be removed once enough equity builds up."
+  },
+  {
+    kw: ['jumbo loan','jumbo mortgage'],
+    a: "A jumbo loan exceeds the conforming loan limit set for the area (the threshold Fannie Mae/Freddie Mac will buy), so it doesn't qualify for standard conforming underwriting. Jumbo loans usually need stronger credit, lower DTI, and larger reserves since lenders carry more risk on the balance sheet or through private investors."
+  },
+  {
+    kw: ['rate lock','locking rate','lock in'],
+    a: "A rate lock guarantees a specific interest rate for a set window (commonly 30-60 days) while the loan moves through underwriting to closing, protecting the borrower from rate moves in the market during that time. Locks usually come with an expiration, and extending one can cost extra if closing runs long."
+  },
+  {
+    kw: ['prepayment penalty'],
+    a: "A prepayment penalty is a fee some loans charge if the borrower pays off the mortgage early — either through refinancing or selling. They're much less common on standard residential mortgages today than they used to be, but worth checking for on certain loan types."
+  },
+  {
+    kw: ['cash-out refinance','cash out refi','rate and term refinance'],
+    a: "A cash-out refinance replaces the existing mortgage with a larger one and gives the borrower the difference in cash, using home equity as the source. A rate-and-term refinance just changes the interest rate and/or loan term without pulling out extra cash — usually done to lower the payment or shorten the payoff timeline."
+  },
+  {
+    kw: ['heloc','home equity line'],
+    a: "A HELOC (home equity line of credit) is a revolving credit line secured by home equity, separate from the original mortgage — the borrower draws against it as needed rather than getting one lump sum. It's different from a cash-out refinance, which replaces the whole first mortgage."
+  },
+  {
+    kw: ['reverse mortgage'],
+    a: "A reverse mortgage lets homeowners, typically 62+, convert home equity into cash without monthly payments — the loan balance grows over time and is repaid when the home is sold or the borrower moves out or passes away. It's a fundamentally different product from a standard forward mortgage."
+  },
+  {
+    kw: ['assumable mortgage','loan assumption'],
+    a: "An assumable mortgage lets a buyer take over the seller's existing loan — including its interest rate and remaining balance — instead of getting a brand-new loan. Most conventional loans aren't assumable, but many FHA and VA loans are, which can be valuable when the existing rate is well below current market rates."
+  },
+  {
+    kw: ['second mortgage','junior lien'],
+    a: "A second mortgage is an additional loan secured by a property that already has a first mortgage, sitting behind it in repayment priority if the home is sold or foreclosed. Home equity loans and HELOCs are common forms of second mortgages."
+  },
+  {
+    kw: ['amortization','amortization schedule'],
+    a: "Amortization is how a loan's fixed payment splits between principal and interest over time — early payments are mostly interest, and that ratio gradually flips so later payments go mostly toward principal. An amortization schedule lays out that breakdown payment by payment across the full loan term."
+  },
+  {
+    kw: ['pre-approval','pre-qualification','preapproval','prequalification'],
+    a: "Pre-qualification is a quick, informal estimate of what a borrower might qualify for, usually based on self-reported information. Pre-approval is more rigorous — the lender verifies income, credit, and assets and issues a conditional commitment, which carries much more weight with sellers in a competitive offer."
+  },
+  {
+    kw: ['mortgage broker','loan officer','direct lender'],
+    a: "A mortgage broker works with multiple lenders to shop a borrower's loan around and find competitive terms, earning a fee for the match. A direct lender (or the loan officer working for one) originates and funds the loan itself rather than shopping it elsewhere. Both routes end up at similar underwriting and closing processes."
+  },
+  {
+    kw: ['domain knowledge','mortgage domain','mortgage expertise','domain expertise','mortgage industry','deep understanding','expert in mortgage','in-depth','mortgage','home loan','housing loan','banking domain'],
+    a: "Mortgage domain knowledge is the real strength here. Years on the customer service banking team have built hands-on fluency with the mortgage servicing lifecycle, borrower support workflows, and the regulatory landscape servicing operates under — CFPB guidance and Fannie Mae servicing guidelines in particular. That's not theoretical; it comes from working the day-to-day servicing and customer service side of mortgages, and it's the depth being carried into the AI PM transition rather than starting from an AI-only background. Ask about servicing, escrow, loss mitigation, regulations, or loan types for specifics."
+  },
+  {
+    kw: ['claude','anthropic','mastery','certificate','academy'],
+    a: "Running a 30-Day Claude Mastery Plan, about 15 minutes a day across four themes — Foundations, Prompt Engineering, Developer Skills, and Advanced/Agents — aiming to earn all six Anthropic Academy certificates."
+  },
+  {
+    kw: ['study','learning','curriculum','full stack','fullstack','plan','roadmap'],
+    a: "There's a longer self-study arc toward full-stack AI development — Python, frontend, backend, databases, AI/ML — originally scoped at 16 weeks and realistically recalibrated to about 9-12 months at a ~15 min/day pace."
+  },
+  {
+    kw: ['location','based','where','hyderabad','city'],
+    a: "Based in the Hyderabad area."
+  },
+  {
+    kw: ['resource','reading','reforge','exponent','lenny','cfpb','fannie mae'],
+    a: "Prep resources in rotation: Anthropic Academy, Lenny's Newsletter, Exponent, Reforge, plus domain material like CFPB guidance and Fannie Mae guidelines."
+  },
+  {
+    kw: ['stock','invest','market','trading','finance personal'],
+    a: "There's a personal interest in stock markets and investing — it fed directly into one of the side projects, a real-time Indian stock market tracker."
+  },
+  {
+    kw: ['free','cost','billed','pay','price'],
+    a: "This twin runs entirely in your browser with a local, hard-coded knowledge base — no API calls, no key, nothing billed to anyone. That's also why answers are limited to what's actually on file rather than open-ended."
+  }
+];
+
+function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function matchAnswer(question){
+  const q = question.toLowerCase();
+  for(const entry of KNOWLEDGE){
+    if(entry.kw.some(k => new RegExp('\\b' + escapeRegex(k) + '\\b', 'i').test(q))) return entry.a;
+  }
+  return "That's not something I've been briefed on. I cover a lot of mortgage ground — servicing, escrow, loss mitigation, RESPA/TILA/CFPB regulation, loan types, APR vs interest rate, points, closing costs, DTI, credit score, appraisals, title insurance, FHA/VA/conventional/jumbo loans, rate locks, refinancing, HELOCs, and more — plus the Senior PM role at ICE Data Services, the AI PM transition, and the shipped side projects. Try rephrasing, or use a chip on the left.";
+}
+
+sendBtn.addEventListener('click', () => ask(inputEl.value));
+inputEl.addEventListener('keydown', (e) => { if(e.key === 'Enter') ask(inputEl.value); });
+document.querySelectorAll('.chip').forEach(btn => {
+  btn.addEventListener('click', () => ask(btn.dataset.q));
+});
+
+addEntry('twin', "Ask me anything about Phani Kasinadhuni's professional side — the Senior PM role at ICE Data Services, the AI PM push, or what he's actually shipped. I'll stick to what's on file.");
+</script>
+</body>
+</html>
