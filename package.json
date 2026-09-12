@@ -1,0 +1,15 @@
+{
+  "name": "digital-twin-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Digital Twin Agent — Phani Kasinadhuni's mortgage-domain AI twin, served as a static site with a Vercel serverless function.",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo \"No build step — static site with serverless function.\"",
+    "start": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}
